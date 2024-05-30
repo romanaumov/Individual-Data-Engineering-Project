@@ -3,76 +3,85 @@ import json
 import csv
 import datetime
 import pytz
-import math
+import os
+import logging
+import time
+import sys
+
+config_path = '/home/ubuntu/iCycleWays/config/'
+sys.path.append(config_path)
+import config
+
+CSV_PATH = config.csv_path
+API_URL = config.api_url
+LOG_PATH = config.log_path
+# API_URL = "https://gis.ccc.govt.nz/server/rest/services/OpenData/Cycle/FeatureServer/1/query?where=1%3D1&outFields=ServiceStatus,MajorCyclewayName,Type,TrafficDirection,CreateDate,LastEditDate,Shape__Length&outSR=4326&f=json"
+# CSV_PATH = "cycle_lines_new.csv"
+
+# Configure logging
+LOG_FOLDER = "logs"
+if not os.path.exists(LOG_FOLDER):
+    os.makedirs(LOG_FOLDER)
+timestamp = time.strftime("%Y%m%d_%H%M%S")
+# log_file_name = f"{LOG_FOLDER}/icycleways_{timestamp}.log"
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler(LOG_PATH),
+        logging.StreamHandler()
+    ]
+)
+
+# Configure logging
+# logging.basicConfig(filename=LOG_PATH, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# logger = logging.getLogger(__name__)
+# # Get today's date
+# timestamp = time.strftime("%Y%m%d_%H%M%S")
 
 def get_data_from_api(api_url):
     response = requests.get(api_url)
 
     if response.status_code == 200:
+        logging.info(f"\n{timestamp} Data was loaded from source successfully.")
         return json.loads(response.text)
     else:
+        logging.info(f"\n{timestamp} Data was loaded from the source unsuccessfully. Error with status code {response.status_code}")
         print(f"Error with status code {response.status_code}")
         return None
 
-# Use the function
-api_url = "https://gis.ccc.govt.nz/server/rest/services/OpenData/Cycle/FeatureServer/1/query?where=1%3D1&outFields=ServiceStatus,MajorCyclewayName,Type,CreateDate,LastEditDate,Shape__Length,Ownership,PublicRelevance&geometry=&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outSR=4326&f=json"
-# api_url = "https://gis.ccc.govt.nz/server/rest/services/OpenData/Cycle/FeatureServer/1/query?outFields=*&where=1%3D1&f=geojson"
-
-data = get_data_from_api(api_url)
-
-# filename_orig = "cycle_lines_orig.csv"
-# # Extract the keys from the dictionary
-# headers_orig = data.keys()
-
-# # Since data is a dictionary, not a list, we write it as a single row
-# with open(filename_orig, 'w', newline='') as f_output:
-#     csv_writer = csv.writer(f_output)
-#     csv_writer.writerow(headers_orig)
-#     csv_writer.writerow([json.dumps(data[col]) for col in headers_orig])
-
-# print("Data has been written to cycle_lines_orig.csv")
-
-
-# OUTPUT_FILES = "./output/" # change the output folder
-# write the results of classification for every frame into csv file
-# filename = f"{OUTPUT_FILES}cycle_lines.csv"
-filename = "/home/ubuntu/cycle_lines.csv"
-
-# The timestamp, in milliseconds
-# timestamp = 1616412806000
-
-# Convert the timestamp to a datetime object
-# dt_object = datetime.datetime.fromtimestamp(timestamp / 1000)
-
-# print(dt_object)
+# Get data from source
+data = get_data_from_api(API_URL)
 
 # Create a timezone object for NZT timezone
 nzt_tz = pytz.timezone('Pacific/Auckland')
-
-# The radius of the Earth, in meters
-R = 6371e3
 
 if data:
     headers = list(data['features'][0]['attributes'].keys())
     headers.append('GeometryPath')
     
     # writing to csv file
-    with open(filename, 'a', newline='') as file:
+    with open(CSV_PATH, 'a', newline='') as file:
         # creating a csv dict writer object
         writer = csv.DictWriter(file, fieldnames=headers)
     
         # writing headers (field names)
         writer.writeheader()
+        logging.info(f"\n{timestamp} The header has been written to {CSV_PATH} successfully.")
 
+    # Parse data from the source and save into file with necessary fields.
     for i in range (0, len(data['features'])):
         
         timestamp_utc_create = data['features'][i]['attributes']['CreateDate']
         create_date_utc = datetime.datetime.fromtimestamp(timestamp_utc_create / 1000)
+        
         # Convert the datetime object to NZT timezone
         CreateDate_NZT = create_date_utc.replace(tzinfo=pytz.utc).astimezone(nzt_tz)
         
         timestamp_utc_edit = data['features'][i]['attributes']['LastEditDate']
         edit_date_utc = datetime.datetime.fromtimestamp(timestamp_utc_edit / 1000)
+        
         # Convert the datetime object to NZT timezone
         LastEditDate_NZT = edit_date_utc.replace(tzinfo=pytz.utc).astimezone(nzt_tz)
         
@@ -80,25 +89,27 @@ if data:
                     'ServiceStatus': data['features'][i]['attributes']['ServiceStatus'], 
                     'MajorCyclewayName': data['features'][i]['attributes']['MajorCyclewayName'], 
                     'Type': data['features'][i]['attributes']['Type'], 
+                    'TrafficDirection': data['features'][i]['attributes']['TrafficDirection'],
                     'CreateDate': CreateDate_NZT,
                     'LastEditDate': LastEditDate_NZT,
-                    # 'Shape__Length': data['features'][i]['attributes']['Shape__Length'],
                     'Shape__Length': round(data['features'][i]['attributes']['Shape__Length'], 2) ,
                     'Ownership': data['features'][i]['attributes']['Ownership'],
                     'PublicRelevance': data['features'][i]['attributes']['PublicRelevance'],
                     'GeometryPath': data['features'][i]['geometry']['paths'],
                 }]
         
-        with open(filename, 'a', newline='') as file:
+        with open(CSV_PATH, 'a', newline='') as file:
             # creating a csv dict writer object
             writer = csv.DictWriter(file, fieldnames=headers)
         
             # writing data rows
             writer.writerows(dict)
 
-    print("Data has been written to cycle_lines.csv")
+    print(f"Data has been written to {CSV_PATH}")
+    logging.info(f"\n{timestamp} Data has been written to {CSV_PATH} successfully.")
 else:
     print("Failed to get data from API")
+    logging.info(f"\n{timestamp} Data has been written to {CSV_PATH} unsuccessfully. Failed to get data from API")
 
 
     

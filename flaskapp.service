@@ -4,7 +4,7 @@ After=network.target
 [Service]
 User=ubuntu
 Group=ubuntu
-WorkingDirectory=/home/ubuntu/CyclePaths
-ExecStart=/home/ubuntu/CyclePaths/venv/bin/gunicorn -w 4 web_server:app
+WorkingDirectory=/home/ubuntu/iCycleWays
+ExecStart=/home/ubuntu/iCycleWays/myvenv/bin/gunicorn -w 4 web_server:app
 [Install]
 WantedBy=multi-user.target

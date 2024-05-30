@@ -1,0 +1,30 @@
+2024-05-30 20:16:59,769 [WARNING]  * Debugger is active!
+2024-05-30 20:16:59,769 [INFO]  * Debugger PIN: 859-436-784
+2024-05-30 20:17:31,523 [INFO] 
+20240530_201659 The file format of metadata is JSON.
+2024-05-30 20:17:31,524 [INFO] 127.0.0.1 - - [30/May/2024 20:17:31] "GET /rna104/cyclewaysapimeta?key=Fish-Sea-Hat-Forest!&data=json HTTP/1.1" 200 -
+2024-05-30 20:17:39,251 [INFO] 
+20240530_201659 The file format of metadata is JSON.
+2024-05-30 20:17:39,251 [INFO] 127.0.0.1 - - [30/May/2024 20:17:39] "GET /rna104/cyclewaysapimeta?key=Fish-Sea-Hat-Forest! HTTP/1.1" 200 -
+2024-05-30 20:17:45,439 [INFO] 
+20240530_201659 The secure api key is not valid!
+2024-05-30 20:17:45,439 [INFO] 127.0.0.1 - - [30/May/2024 20:17:45] "[31m[1mGET /rna104/cyclewaysapimeta?key=Fish-Sea-Hat-Forest HTTP/1.1[0m" 401 -
+2024-05-30 20:17:54,025 [INFO] 
+20240530_201659 The file format of metadata is JSON.
+2024-05-30 20:17:54,025 [INFO] 127.0.0.1 - - [30/May/2024 20:17:54] "GET /rna104/cyclewaysapimeta?key=Fish-Sea-Hat-Forest!&data=json HTTP/1.1" 200 -
+2024-05-30 20:18:00,741 [INFO] 
+20240530_201659 The file format of metadata is JSON.
+2024-05-30 20:18:00,741 [INFO] 127.0.0.1 - - [30/May/2024 20:18:00] "GET /rna104/cyclewaysapimeta?key=Fish-Sea-Hat-Forest! HTTP/1.1" 200 -
+2024-05-30 20:18:06,473 [INFO] 
+20240530_201659 Incorrect format of data in query. Use the following types of format - HTML, CSV, JSON only.
+2024-05-30 20:18:06,474 [INFO] 127.0.0.1 - - [30/May/2024 20:18:06] "[31m[1mGET /rna104/cyclewaysapi?key=Fish-Sea-Hat-Forest! HTTP/1.1[0m" 400 -
+2024-05-30 20:18:13,799 [INFO] 
+20240530_201659 Query with JSON format of data.
+2024-05-30 20:18:13,941 [INFO] 127.0.0.1 - - [30/May/2024 20:18:13] "GET /rna104/cyclewaysapi?key=Fish-Sea-Hat-Forest!&data=json HTTP/1.1" 200 -
+2024-05-30 20:18:19,482 [INFO] 
+20240530_201659 Query with HTML format of data.
+2024-05-30 20:18:19,594 [INFO] 127.0.0.1 - - [30/May/2024 20:18:19] "GET /rna104/cyclewaysapi?key=Fish-Sea-Hat-Forest!&data=html HTTP/1.1" 200 -
+2024-05-30 20:18:26,137 [INFO] 
+20240530_201659 Query with CSV format of data.
+2024-05-30 20:18:26,182 [INFO] 127.0.0.1 - - [30/May/2024 20:18:26] "GET /rna104/cyclewaysapi?key=Fish-Sea-Hat-Forest!&data=csv HTTP/1.1" 200 -
+2024-05-30 20:19:19,115 [INFO]  * Detected change in '/home/roman/0_Git/Individual-Data-Engineering-Project/web_server.py', reloading

@@ -1,0 +1,9 @@
+
+# ignore all .mp4, .zip, .tfr files
+*.mp4
+*.avi
+*.zip
+*.gz
+*.tfr
+config_with_data.yaml
+temp_metadata.json
