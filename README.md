@@ -1,4 +1,4 @@
-# `Fire Predictions in Christchurch` Group Project for DATA472 course at the University of Canterbury
+# `Cycle Ways in Christchurch` Individual Project for DATA472 course at the University of Canterbury
 
 ## Cycle Ways Individual Project 
 
@@ -120,7 +120,34 @@ iCycleWays/
 `web_server.py` - main web server file
 
 
-### 5. Setup Gunicorn environment on EC2
+### 5. Setup environmental variables on EC2
+
+1. Replace environmental variables for connection to database in the file `iCycleWays/config/config.yaml`
+
+```bash
+db_name: "<your_db_name>"
+db_user: "<your_db_user>"
+db_password: "<your_db_password>"
+db_host: "<your_db_host>"
+api_key: "<your_secret_key>"
+```
+
+### 6. Create Individual MySQL DB on RDS
+
+1. Run the script `create_db.py` in the terminal for creating database and tables using the command `python3 create_db.py`.
+
+The following tables will be created `data`, `metadata` and `metadata_attributes` in the database `individual_db`.
+
+Examples of database tables after creation and data inserting please see below:
+
+![metadata](./images_for_readme/metadata.png)
+
+![metadata_attributes](./images_for_readme/attributes.png)
+
+![data](./images_for_readme/data.png)
+
+
+### 7. Setup Gunicorn environment on EC2
 
 1. Copy a `flaskapp.service` file from `iCycleWays` to the `/etc/systemd/system/` folder using the command 
 
@@ -137,7 +164,7 @@ sudo systemctl start flaskapp
 sudo systemctl enable flaskapp
 ```
 
-### 6. Setup Nginx environment on EC2 
+### 8. Setup Nginx environment on EC2 
 
 1. Install nginx by running the following command:
 
@@ -187,7 +214,7 @@ sudo systemctl restart nginx
 Now the web application will be available at the EC2 public IP address from the browser. `http://<EC2-PUBLIC-IP-ADDRESS>`
 
 
-### 7. Schedule tasks using Cron on EC2
+### 9. Schedule tasks using Cron on EC2
 
 To periodically update prediction files, they need to be obtained from the S3 File server. For this, Cron is used with a schedule for collecting files every hour.
 
@@ -197,7 +224,7 @@ To periodically update prediction files, they need to be obtained from the S3 Fi
 
 2. Using the command `crontab -e` add the following entry to run the script every hour
 
-`0 */24 * * * /home/ubuntu/iCycleWays/get_data.sh`
+`0 */24 * * * /home/ubuntu/iCycleWays/get_insert_data.sh`
 
 3. Check if the entry was successfully added to the Cron table, run the command `crontab -l`
 
@@ -250,11 +277,11 @@ The metadata file includes a dataset description, source URL, and version number
 
 ## Logging proccess
 
-Для логгирования использовалась библиотека logging. Файлы формируются в папке logs и содеражат два уровня критичности:
+The logging library was used for logging. The files are generated in the logs folder and contain two levels of criticality:
 
-**info** - содержит информацию о выполнении процессов коннекта к БД, записи в БД, записи в файлы на диске и т.д.
+**info** - contains information about the execution of processes connecting to the database, writing to the database, writing to files on disk, etc.
 
-**error** - содержит информацию об ошибках или неправльно введенных данных в API запрос и перехваченных сервером.
+**error** - contains information about errors or incorrectly entered data into the API request and intercepted by the server.
 
 
 ## Conclusion
@@ -266,8 +293,8 @@ The entire Cycle Ways project was developed from scratch (from idea to implement
 3. **Logging** library to log any messages. 
 
 ## Future tasks
-- Автоматизировать процесс сбора информации еще лучше.
-- Улучшить работу логгирования всей системы.
-- Внедрить AirFlow, Docker Terraform для более эффективного управления, развертывания и управления системой.
+- Automate the information collection process even better.
+- Improve logging of the entire system.
+- Implement AirFlow, Docker Terraform for more efficient system management, deployment and management.
 
 If you have any questions, please feel free to ask us.
