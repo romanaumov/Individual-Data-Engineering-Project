@@ -64,7 +64,7 @@ Additionally, basic information how to create and tune your EC2 instance you can
 2. Copy the local folder on your machine to EC2 home directory running the command below on your local machine in terminal
 
 ```
-cd <PATH-YOUR-LOCAL-DIRECTORY>iFireTracker
+cd <PATH-YOUR-LOCAL-DIRECTORY>iCycleWays
 scp -i <PATH-TO-YOUR-PEM-KEY-ON-LOCAL-MACHINE> -r iCycleWays ubuntu@<EC2-PUBLIC-IP-ADDRESS>:/home/ubuntu/
 ```
 
