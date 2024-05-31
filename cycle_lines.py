@@ -52,9 +52,9 @@ def insert_data_into_db(dict, time_NZT):
                     password=db_password,
                     database=db_name
                 )
-        print(f'{time_NZT} The connection to DB was established.')
     except mysql.connector.Error as err:
-        print(f'{time_NZT} The connection to DB was not established, error was appeared {err}!')
+        logging.info(f"\n{time_NZT} The connection to DB was not established, error was appeared {err}!")
+        
         return
     
     try:
@@ -97,7 +97,7 @@ def insert_data_into_db(dict, time_NZT):
         db_connection.close()
         
     except mysql.connector.Error as err:
-        print(f'{time_NZT} The data was inserted into tables unsuccessful, error was appeared {err}!')
+        logging.info(f"\n{time_NZT} The data was inserted into tables unsuccessful, error was appeared {err}!")
         db_connection.rollback()    
     return
 
@@ -167,9 +167,7 @@ if data:
             # writing data rows
             writer.writerows(dict)
 
-    print(f"Data has been written to {CSV_PATH}")
     logging.info(f"\n{time_NZT} Data has been written to {CSV_PATH} and Database successfully.")
     
 else:
-    print("Failed to get data from API")
     logging.info(f"\n{time_NZT} Data has been written to {CSV_PATH} unsuccessfully. Failed to get data from API")
