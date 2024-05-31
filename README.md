@@ -59,7 +59,7 @@ Additionally, basic information how to create and tune your EC2 instance you can
 
 1. To work with EC2 instance you should connect to this virtual environment. You can do it using `ssh` or just use AWS web interface to click the `Connect` button on the top right corner of EC2 instance page and select the tab `EC2 Instance Connect` by default, you will be able to connect to the instance without any further setup.
 
-![AWS connection](./images_for_readme/aws-conn.png)
+![AWS connection](./images_for_readme/aws-connection.png)
 
 2. Copy the local folder on your machine to EC2 home directory running the command below on your local machine in terminal
 
