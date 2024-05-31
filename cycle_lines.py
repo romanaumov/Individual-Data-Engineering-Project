@@ -7,11 +7,17 @@ import os
 import logging
 import datetime
 import sys
+import mysql.connector
 
 config_path = '/home/ubuntu/iCycleWays/config/'
+# config_path = './config/'
 sys.path.append(config_path)
 import config
 
+db_name = config.db_name
+db_user = config.db_user
+db_password = config.db_password
+db_host = config.db_host
 CSV_PATH = config.csv_path
 API_URL = config.api_url
 LOG_PATH = config.log_path
@@ -37,6 +43,64 @@ logging.basicConfig(
     ]
 )
 
+def insert_data_into_db(dict, time_NZT):
+    try:
+        # Connect to individual_db MySQL database
+        db_connection = mysql.connector.connect(
+                    host=db_host,
+                    user=db_user,
+                    password=db_password,
+                    database=db_name
+                )
+        print(f'{time_NZT} The connection to DB was established.')
+    except mysql.connector.Error as err:
+        print(f'{time_NZT} The connection to DB was not established, error was appeared {err}!')
+        return
+    
+    try:
+        cursor = db_connection.cursor()
+        
+        # Insert user data into the database
+        cursor.execute('''
+                    INSERT INTO data (
+                        timestamp,
+                        service_status,
+                        major_cycleway_name,
+                        type,
+                        traffic_direction,
+                        create_date,
+                        last_edit_date,
+                        shape_length,
+                        ownership,
+                        public_relevance,
+                        geometry
+                        ) 
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ''',
+                        (time_NZT,
+                        dict[0]['ServiceStatus'],
+                        dict[0]['MajorCyclewayName'],
+                        dict[0]['Type'],
+                        dict[0]['TrafficDirection'],
+                        dict[0]['CreateDate'],
+                        dict[0]['LastEditDate'],
+                        dict[0]['Shape__Length'],
+                        dict[0]['Ownership'],
+                        dict[0]['PublicRelevance'],
+                        str(dict[0]['GeometryPath']))
+        )
+        
+        db_connection.commit()
+
+        # Close the database connection
+        cursor.close()
+        db_connection.close()
+        
+    except mysql.connector.Error as err:
+        print(f'{time_NZT} The data was inserted into tables unsuccessful, error was appeared {err}!')
+        db_connection.rollback()    
+    return
+
 def get_data_from_api(api_url):
     response = requests.get(api_url)
 
@@ -44,7 +108,7 @@ def get_data_from_api(api_url):
         logging.info(f"\n{time_NZT} Data was loaded from source successfully.")
         return json.loads(response.text)
     else:
-        logging.info(f"\n{time_NZT} Data was loaded from the source unsuccessfully. Error with status code {response.status_code}")
+        logging.error(f"\n{time_NZT} Data was loaded from the source unsuccessfully. Error with status code {response.status_code}")
         print(f"Error with status code {response.status_code}")
         return None
 
@@ -56,7 +120,7 @@ if data:
     headers.append('GeometryPath')
     
     # writing to csv file
-    with open(CSV_PATH, 'a', newline='') as file:
+    with open(CSV_PATH, 'w', newline='') as file:
         # creating a csv dict writer object
         writer = csv.DictWriter(file, fieldnames=headers)
     
@@ -64,6 +128,8 @@ if data:
         writer.writeheader()
         logging.info(f"\n{time_NZT} The header has been written to {CSV_PATH} successfully.")
 
+    logging.info(f"\n{time_NZT} Parse data from the source and save into file and DB tables ....")
+    
     # Parse data from the source and save into file with necessary fields.
     for i in range (0, len(data['features'])):
         
@@ -92,6 +158,8 @@ if data:
                     'GeometryPath': data['features'][i]['geometry']['paths'],
                 }]
         
+        insert_data_into_db(dict, time_NZT)
+        
         with open(CSV_PATH, 'a', newline='') as file:
             # creating a csv dict writer object
             writer = csv.DictWriter(file, fieldnames=headers)
@@ -100,43 +168,8 @@ if data:
             writer.writerows(dict)
 
     print(f"Data has been written to {CSV_PATH}")
-    logging.info(f"\n{time_NZT} Data has been written to {CSV_PATH} successfully.")
+    logging.info(f"\n{time_NZT} Data has been written to {CSV_PATH} and Database successfully.")
+    
 else:
     print("Failed to get data from API")
     logging.info(f"\n{time_NZT} Data has been written to {CSV_PATH} unsuccessfully. Failed to get data from API")
-
-
-    
-# {
-#     'attributes': 
-#         {
-#             'ServiceStatus': 'In Service', 
-#             'MajorCyclewayName': 'South Express Cycleway', 
-#             'Type': 'Cycleway', 
-#             'CreateDate': 1710188478000, 
-#             'LastEditDate': 1710188478000, 
-#             'Shape__Length': 318.5999227930278, 
-#             'Ownership': 'CCC', 
-#             'PublicRelevance': 'Public'
-#         }, 
-#     'geometry': 
-#         {
-#             'paths': [[[172.5511221115049, -43.5356679321132], 
-#                     [172.55112212094105, -43.53566766112292], 
-#                     [172.55104247831542, -43.535693141032205], 
-#                     [172.5509408241918, -43.53569702693292], 
-#                     [172.55083914012886, -43.53570494471963], 
-#                     [172.5507353531418, -43.535747216993435], 
-#                     [172.55049419888073, -43.5358749810029], 
-#                     [172.55034392922508, -43.53595605397301], 
-#                     [172.5498561840983, -43.53545138446587], 
-#                     [172.54980854420998, -43.53539742633398], 
-#                     [172.54967683020024, -43.53546815360183], 
-#                     [172.5489837886041, -43.53474355900613], 
-#                     [172.54872522496436, -43.53448040937976], 
-#                     [172.54865930104194, -43.53440083809024], 
-#                     [172.5486429331808, -43.53436582355185], 
-#                     [172.54863767065402, -43.534328163288485], 
-#                     [172.54864901311146, -43.53428608807074]]]
-#         }
-# }

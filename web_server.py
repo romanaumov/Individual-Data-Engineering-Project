@@ -8,6 +8,7 @@ import glob
 import datetime
 import pytz
 import sys
+import mysql.connector
 
 config_path = '/home/ubuntu/iCycleWays/config/'
 sys.path.append(config_path)
@@ -45,12 +46,71 @@ logging.basicConfig(
 
 app = Flask(__name__)
 
-def get_metadata(version):
-    file = get_version_metafile(version)
-    # Open the JSON file for reading
-    with open(file, 'r') as f:
-        # Load the JSON data from the file
-        data = json.load(f)
+# get metadata from db
+def get_version_metafile_from_db(version):
+    try:
+        # Connect to individual_db MySQL database
+        db_connection = mysql.connector.connect(
+                    host=db_host,
+                    user=db_user,
+                    password=db_password,
+                    database=db_name
+                )
+        print(f'{time_NZT} The connection to DB was established.')
+    except mysql.connector.Error as err:
+        print(f'{time_NZT} The connection to DB was not established, error was appeared {err}!')
+    
+    data = None
+    try:
+        cursor = db_connection.cursor()
+
+        # Find metadata with specific version
+        cursor.execute('''
+                        SELECT 1 FROM metadata WHERE 
+                        version = %s
+                        ''',
+                        (version)
+                        )
+        metadata_row = cursor.fetchone()
+        
+        # if with specific version nothing found, use the maximum version
+        if metadata_row is None:
+            print(f'{time_NZT} There no metadata with defined version. Try to find the latest version of metadata')
+            cursor.execute('''
+                        SELECT * FROM metadata 
+                        WHERE version = (SELECT MAX(version) FROM metadata) 
+                        '''
+                        )
+            metadata_row = cursor.fetchone()
+
+        # Query the metadata_attributes table
+        cursor.execute("SELECT * FROM metadata_attributes WHERE attributes_id IN ({0})".format(','.join(map(str, json.loads(metadata_row[4])))))
+        metadata_attributes_rows = cursor.fetchall()
+
+        # Create the data dictionary
+        data = {
+            "Dataset Name": metadata_row[1],
+            "Data Source": metadata_row[2],
+            "Description": metadata_row[3],
+            "Version": metadata_row[0],
+            "Attributes": [
+                {
+                    "id": row[0],
+                    "field": row[1],
+                    "type": row[2],
+                    "description": row[3]
+                } for row in metadata_attributes_rows
+            ]
+        }
+
+        # Close the database connection
+        cursor.close()
+        db_connection.close()
+        print(f'{time_NZT} The metadata have got from tables successfully!')
+        
+    except mysql.connector.Error as err:
+        print(f'{time_NZT} The metadata have got from tables unsuccessful, error was appeared {err}!')
+        db_connection.rollback()    
     return data
 
 # Now exists 4 versions of meatadata: 1.0, 1.1, 2.1, 2.2
@@ -89,6 +149,22 @@ def get_version_metafile(version):
     logging.info(f"\n{time_NZT} The version of metadata was found is following: {version_file}")
     return version_file
 
+# get metadata from file
+def get_metadata(version):
+    file = get_version_metafile(version)
+    # Open the JSON file for reading
+    with open(file, 'r') as f:
+        # Load the JSON data from the file
+        data = json.load(f)
+    
+    # If metadata is empty in files, try to get metadata from DB
+    if data is None:
+        data = get_version_metafile_from_db(version)
+        print(f'{time_NZT} The metadata have got from DB.')
+        
+    print(f'{time_NZT} The metadata have got from files.')
+    return data
+
 # http://<IP-ADDRESS>/rna104/cyclewaysapi?key=<YOUR-API-KEY>&data=html&version=<YOUR-VERSION>
 # http://<IP-ADDRESS>/rna104/cyclewaysapi?key=<YOUR-API-KEY>&data=csv&version=<YOUR-VERSION>
 # http://<IP-ADDRESS>/rna104/cyclewaysapi?key=<YOUR-API-KEY>&data=json&version=<YOUR-VERSION>
@@ -119,7 +195,7 @@ def query():
     if data is not None:
         
         # get metadata according to the version
-        metadata = get_metadata(version)
+        metadata = get_metadata(version)        
         attributes = [attr['field'] for attr in metadata['Attributes']]
         logging.info(f"\n{time_NZT} The attributes of metadata is following: {attributes}")
         
@@ -182,14 +258,14 @@ def meta():
         
     if data is not None:
         if api_key != API_KEY:
-            logging.info(f"\n{time_NZT} The secure api key is not valid!")
+            logging.error(f"\n{time_NZT} The secure api key is not valid!")
             return jsonify({"error": "The secure api key is not valid!"}), 401
 
         logging.info(f"\n{time_NZT} The file format of metadata is JSON.")
         return json.dumps(data, indent=4)
     
     else:
-        logging.info(f"\n{time_NZT} Incorrect format of data in query. Use the following types of format - data = HTML, CSV, or JSON only.")
+        logging.error(f"\n{time_NZT} Incorrect format of data in query. Use the following types of format - data = HTML, CSV, or JSON only.")
         return jsonify({"error": "Incorrect format of data in query. Use the following types of format - data = HTML, CSV, or JSON only."}), 500
 
 if __name__ == '__main__':
