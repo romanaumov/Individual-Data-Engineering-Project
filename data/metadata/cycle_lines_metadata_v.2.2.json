@@ -1,0 +1,58 @@
+{
+    "Dataset Name": "CycleWays",
+    "Data Source": "https://gis.ccc.govt.nz/server/rest/services/OpenData/Cycle/FeatureServer/1/query?where=1%3D1&outFields=ServiceStatus,MajorCyclewayName,Type,TrafficDirection,CreateDate,LastEditDate,Shape__Length,Ownership,PublicRelevance&outSR=4326&f=json",
+    "Description": "The dataset contains the information about cycleways in Christchurch. A dedicated route or path designed specifically for bicycles, providing a safe and convenient means of transportation for people who cycle and encouraging cycling as a sustainable and healthy mode of transportation. It is spatially abstracted to a Line.",
+    "Version": "2.2",
+    "Attributes":[
+        {
+            "field":"ServiceStatus",
+            "type":"string",
+            "description":"The status of cycleway, can be in three statuses: In Service, Not In Service, In Capital Programme"
+        },
+        {
+            "field":"MajorCyclewayName",
+            "type":"string",
+            "description":"The name of cycleway in Christchurch"
+        },
+        {
+            "field":"Type",
+            "type":"string",
+            "description":"The type of cycleway, can be different types, like  Shared path, Cycle line, etc."
+        },
+        {
+            "field":"TrafficDirection",
+            "type":"string",
+            "description":"The direction of cycleway, can be different types, like Both or One way."
+        },
+        {
+            "field":"CreateDate",
+            "type":"string",
+            "description":"The date of cycleway creation in Christchurch"
+        },
+        {
+            "field":"LastEditDate",
+            "type":"string",
+            "description":"The last date of edited information about cycleway in Christchurch"
+        },
+        {
+            "field":"Shape__Length",
+            "type":"float",
+            "description":"The length of cycleway in meters"
+        },
+        {
+            "field":"Ownership",
+            "type":"float",
+            "description":"The owner of cycleway."
+        },
+        {
+            "field":"PublicRelevance",
+            "type":"float",
+            "description":"The relevance to public places."
+        },
+        {
+            "field":"GeometryPath",
+            "type":"MULTIPOLYGON",
+            "description":"The set of coordinates of the cycleway line on the map in Christchurch"
+        }
+    ]
+}

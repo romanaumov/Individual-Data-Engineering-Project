@@ -1,8 +1,8 @@
 {
     "Dataset Name": "CycleWays",
-    "Data Source": "https://gis.ccc.govt.nz/server/rest/services/OpenData/Cycle/FeatureServer/1/query?where=1%3D1&outFields=ServiceStatus,MajorCyclewayName,Type,TrafficDirection,CreateDate,LastEditDate,Shape__Length,Ownership,PublicRelevance&outSR=4326&f=json",
+    "Data Source": "https://gis.ccc.govt.nz/server/rest/services/OpenData/Cycle/FeatureServer/1/query?where=1%3D1&outFields=ServiceStatus,MajorCyclewayName,Type,CreateDate,LastEditDate,Shape__Length&outSR=4326&f=json",
     "Description": "The dataset contains the information about cycleways in Christchurch. A dedicated route or path designed specifically for bicycles, providing a safe and convenient means of transportation for people who cycle and encouraging cycling as a sustainable and healthy mode of transportation. It is spatially abstracted to a Line.",
-    "Version": "1.0",
+    "Version": "2.1",
     "Attributes":[
         {
             "field":"ServiceStatus",

@@ -5,7 +5,7 @@ import datetime
 import pytz
 import os
 import logging
-import time
+import datetime
 import sys
 
 config_path = '/home/ubuntu/iCycleWays/config/'
@@ -15,15 +15,18 @@ import config
 CSV_PATH = config.csv_path
 API_URL = config.api_url
 LOG_PATH = config.log_path
-# API_URL = "https://gis.ccc.govt.nz/server/rest/services/OpenData/Cycle/FeatureServer/1/query?where=1%3D1&outFields=ServiceStatus,MajorCyclewayName,Type,TrafficDirection,CreateDate,LastEditDate,Shape__Length&outSR=4326&f=json"
-# CSV_PATH = "cycle_lines_new.csv"
+
+# # Get a NZT timezone 
+nzt_tz = pytz.timezone('Pacific/Auckland')
+time_utc = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+time_utc_str = datetime.datetime.strptime(time_utc, '%Y-%m-%d %H:%M:%S')
+time_NZT = time_utc_str.astimezone(nzt_tz)
 
 # Configure logging
 LOG_FOLDER = "logs"
 if not os.path.exists(LOG_FOLDER):
     os.makedirs(LOG_FOLDER)
-timestamp = time.strftime("%Y%m%d_%H%M%S")
-# log_file_name = f"{LOG_FOLDER}/icycleways_{timestamp}.log"
+# timestamp = time.strftime("%Y%m%d_%H%M%S")
 
 logging.basicConfig(
     level=logging.INFO,
@@ -34,28 +37,19 @@ logging.basicConfig(
     ]
 )
 
-# Configure logging
-# logging.basicConfig(filename=LOG_PATH, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-# logger = logging.getLogger(__name__)
-# # Get today's date
-# timestamp = time.strftime("%Y%m%d_%H%M%S")
-
 def get_data_from_api(api_url):
     response = requests.get(api_url)
 
     if response.status_code == 200:
-        logging.info(f"\n{timestamp} Data was loaded from source successfully.")
+        logging.info(f"\n{time_NZT} Data was loaded from source successfully.")
         return json.loads(response.text)
     else:
-        logging.info(f"\n{timestamp} Data was loaded from the source unsuccessfully. Error with status code {response.status_code}")
+        logging.info(f"\n{time_NZT} Data was loaded from the source unsuccessfully. Error with status code {response.status_code}")
         print(f"Error with status code {response.status_code}")
         return None
 
 # Get data from source
 data = get_data_from_api(API_URL)
-
-# Create a timezone object for NZT timezone
-nzt_tz = pytz.timezone('Pacific/Auckland')
 
 if data:
     headers = list(data['features'][0]['attributes'].keys())
@@ -68,7 +62,7 @@ if data:
     
         # writing headers (field names)
         writer.writeheader()
-        logging.info(f"\n{timestamp} The header has been written to {CSV_PATH} successfully.")
+        logging.info(f"\n{time_NZT} The header has been written to {CSV_PATH} successfully.")
 
     # Parse data from the source and save into file with necessary fields.
     for i in range (0, len(data['features'])):
@@ -106,10 +100,10 @@ if data:
             writer.writerows(dict)
 
     print(f"Data has been written to {CSV_PATH}")
-    logging.info(f"\n{timestamp} Data has been written to {CSV_PATH} successfully.")
+    logging.info(f"\n{time_NZT} Data has been written to {CSV_PATH} successfully.")
 else:
     print("Failed to get data from API")
-    logging.info(f"\n{timestamp} Data has been written to {CSV_PATH} unsuccessfully. Failed to get data from API")
+    logging.info(f"\n{time_NZT} Data has been written to {CSV_PATH} unsuccessfully. Failed to get data from API")
 
 
     

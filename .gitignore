@@ -6,4 +6,3 @@
 *.gz
 *.tfr
 config_with_data.yaml
-temp_metadata.json
