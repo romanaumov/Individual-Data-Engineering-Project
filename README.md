@@ -223,15 +223,15 @@ Now the web application will be available at the EC2 public IP address from the 
 
 ### 9. Schedule tasks using Cron on EC2
 
-To periodically update prediction files, they need to be obtained from the S3 File server. For this, Cron is used with a schedule for collecting files every hour.
+To periodically update data and metadata, they need to be obtained from source website via API. For this, Cron is used with a schedule for collecting files every day at midnight.
 
-1. Grant file execution rights to copy prediction files from the S3 File server.
+1. Grant file execution rights to get data from source via API and insert metadata into DB.
 
 `chmod +x get_insert_data.sh`
 
-2. Using the command `crontab -e` add the following entry to run the script every hour
+2. Using the command `crontab -e` add the following entry to run the script every day at midnight
 
-`0 */24 * * * /home/ubuntu/iCycleWays/get_insert_data.sh`
+`0 0 * * * /home/ubuntu/iCycleWays/get_insert_data.sh`
 
 3. Check if the entry was successfully added to the Cron table, run the command `crontab -l`
 
