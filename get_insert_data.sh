@@ -6,6 +6,6 @@ source myvenv/bin/activate
 python3 cycle_lines.py >> ./logs/get_data.log 2>> ./logs/get_data_error.log
 
 # Insert metadata into DB
-python3 insert_attributes.py >> ./logs/insert_metadata.log 2>> ./insert_metadata_error.log
+python3 insert_attributes.py >> ./logs/insert_metadata.log 2>> ./logs/insert_metadata_error.log
 
 

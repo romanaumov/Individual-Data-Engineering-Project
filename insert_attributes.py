@@ -53,7 +53,7 @@ def insert_attributes_into_db():
                     password=db_password,
                     database=db_name
                 )
-        logging.info(f"\n{time_NZT} The connection to DB was established.")
+        # logging.info(f"\n{time_NZT} The connection to DB was established.")
     except mysql.connector.Error as err:
         logging.error(f"\n{time_NZT} The connection to DB was not established, error was appeared {err}!")
         return
@@ -122,7 +122,7 @@ def insert_metadata_into_db(metafile):
                     password=db_password,
                     database=db_name
                 )
-        logging.info(f"\n{time_NZT} The connection to DB was established.")
+        # logging.info(f"\n{time_NZT} The connection to DB was established.")
     except mysql.connector.Error as err:
         logging.error(f"\n{time_NZT} The connection to DB was not established, error was appeared {err}!")
         return
