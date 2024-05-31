@@ -45,7 +45,7 @@ The pipeline how to deploy overall system into Amazon Cloud (AWS) is described b
 
 ```
 cd PATH-YOUR-LOCAL-DIRECTORY
-git clone https://github.com/UC-JARRD/iFireTracker.git
+git clone https://github.com/romanaumov/Individual-Data-Engineering-Project.git
 ```
 
 ### 2. Create a AWS EC2 for WebServer instance
@@ -111,12 +111,19 @@ iCycleWays/
 ```
 
 `data` - contains metadata and data files
+
 `config` - contains sensitive information for connecting to parts of the system
+
 `logs` - system logs
+
 `templates` - template for displaying the HTML page
+
 `create_db.py` - creating a database and tables
+
 `cycle_lines.py` - request data from the source and save it in the database and file system
+
 `insert_attributes.py` - filling database tables with metadata
+
 `web_server.py` - main web server file
 
 
@@ -220,7 +227,7 @@ To periodically update prediction files, they need to be obtained from the S3 Fi
 
 1. Grant file execution rights to copy prediction files from the S3 File server.
 
-`chmod +x get_s3.sh`
+`chmod +x get_insert_data.sh`
 
 2. Using the command `crontab -e` add the following entry to run the script every hour
 
